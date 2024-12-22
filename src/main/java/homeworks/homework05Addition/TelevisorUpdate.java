@@ -85,7 +85,7 @@ public class TelevisorUpdate {
         System.out.println("Модель: " + model);
         System.out.println("Диагональ: " + diagonal);
     }
-    /* переопределение метода toString() */
+    /* переопределение метода toString() х*/
     @Override
     public String toString() {
         return "Производитель: " + manufacturer + " Модель: " + model + " Диагональ: " + diagonal;
