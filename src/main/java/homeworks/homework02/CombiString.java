@@ -6,7 +6,7 @@ package homeworks.homework02;/*
 public class CombiString {
     public static void main(String[] args) {
         String word = "Java";
-        //создаем переменную n, котороя будет означать количество повторений
+        //создаем переменную n, которая будет означать количество повторений
         int n = 8;
         for (int i = 0; i < n; i++) {
             System.out.print(word);
