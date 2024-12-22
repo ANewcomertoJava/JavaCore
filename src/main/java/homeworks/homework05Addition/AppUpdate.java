@@ -1,10 +1,10 @@
 package homeworks.homework05Addition;
 
-import scr.Televisor;
+
 
 public class AppUpdate {
         public static void main(String[] args) {
-                // создание экземпляров класса Televisor
+
                 TelevisorUpdate tv1 = new TelevisorUpdate("Rubin", "OZOZNE10101", 120);
                 TelevisorUpdate tv2 = new TelevisorUpdate("Rubin", "OZOZNE10101", 120);
 
