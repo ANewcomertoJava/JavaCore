@@ -14,7 +14,7 @@ public class LetterEnKeyboard {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Введите букву английского алфавита:");
+        System.out.println("Введите букву английского  алфавита:");
         char inputLetter = scanner.nextLine().toLowerCase().charAt(0); // Получаем первый символ введённого текста и приводим его к нижнему регистру.
         scanner.close();
 
