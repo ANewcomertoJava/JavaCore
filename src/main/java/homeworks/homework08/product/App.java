@@ -12,7 +12,7 @@ public class App {
 
 
         try {
-            FileReader fileReader = new FileReader("src/main/java/homeworks/homework08/input.txt");
+            FileReader fileReader = new FileReader("src/main/java/homeworks/homework08/product/input.txt");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while (bufferedReader.ready()) {
                 System.out.println(bufferedReader.readLine());
