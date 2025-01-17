@@ -55,6 +55,3 @@ public class Product {
         return Objects.hash(productName, cost);
     }
 }
-
-
-
