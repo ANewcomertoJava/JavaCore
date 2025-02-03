@@ -1,81 +1,57 @@
 package homeworks.homework07;
+
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class App {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
 
-        try {
-            // Создание покупателей
-            List<Person> buyers = new ArrayList<>();
-            System.out.print("Введите количество покупателей: ");
-            int numBuyers = Integer.parseInt(scanner.nextLine());
+        try (Scanner scanner = new Scanner(System.in)) {
+            // Чтение списка покупателей
+            System.out.print("Введите имена и деньги покупателей через равно: ");
+            String input = scanner.nextLine();
 
-            for (int i = 0; i < numBuyers; i++) {
-                System.out.print("Введите имя покупателя: ");
-                String buyerName = scanner.nextLine();
-                System.out.print("Введите сумму денег у покупателя: ");
-                double buyerMoney = Double.parseDouble(scanner.nextLine());
-                buyers.add(new Person(buyerName, buyerMoney));
+            List<Person> buyers = extractBuyersFromInput(input);
+
+            for (Person buyer : buyers) {
+                System.out.println(buyer);
             }
 
-            // Создание товаров
-            List<Product> products = new ArrayList<>();
-            System.out.print("Введите количество товаров: ");
-            int numProducts = Integer.parseInt(scanner.nextLine());
+            // Чтение списка товаров
+            System.out.print("Введите названия и цены товаров через равно: ");
+            String inputProduct = scanner.nextLine();
 
-            for (int i = 0; i < numProducts; i++) {
-                System.out.print("Введите название товара: ");
-                String productName = scanner.nextLine();
-                System.out.print("Введите цену товара: ");
-                double productPrice = Double.parseDouble(scanner.nextLine());
-                products.add(new Product(productName, productPrice));
-            }
+            List<Product> products = extractProductsFromInput(inputProduct);
 
-            // Добавляем скидку
-            System.out.print("Хотите добавить скидку? (да/нет): ");
-            String discountChoice = scanner.nextLine();
-            if (discountChoice.equalsIgnoreCase("да")) {
-                System.out.print("Введите название товара: ");
-                String productName = scanner.nextLine();
-                System.out.print("Введите цену товара: ");
-                double productPrice = Double.parseDouble(scanner.nextLine());
-                System.out.print("Введите процент скидки (0-100%): ");
-                double discountPercent = Double.parseDouble(scanner.nextLine());
-                LocalDate expirationDate = LocalDate.now().plusMonths(1);
-                products.add(new DiscountProduct(productName, productPrice, discountPercent, expirationDate));
+            for (Product product : products) {
+                System.out.println(product);
             }
 
             // Процесс покупки
+            List<String> purchaseLines = new ArrayList<>();
             while (true) {
-                for (Person buyer : buyers) {
-                    System.out.println("\nТекущий покупатель: " + buyer.getName());
-                    boolean boughtSomething = false;
+                System.out.print("Введите имя покупателя и название товара через пробел или 'END' для завершения: ");
+                String inputPurchase = scanner.nextLine().trim();
 
-                    for (Product product : products) {
-                        if (buyer.getMoney() >= product.getCost()) {
-                            System.out.printf("%s купил %s\n", buyer.getName(), product.getProductName());
-                            buyer.setMoney(buyer.getMoney() - product.getCost());
-                            boughtSomething = true;
-                        } else {
-                            System.out.printf("%s не может позволить себе %s\n",
-                                    buyer.getName(), product.getProductName());
-                        }
-                    }
-
-                    if (!boughtSomething) {
-                        System.out.println(buyer.getName() + " ничего не куплено");
-                    }
-                }
-
-                System.out.print("Продолжить покупки? (да/нет): ");
-                String choice = scanner.nextLine();
-                if (choice.equalsIgnoreCase("нет")) {
+                if (inputPurchase.equalsIgnoreCase("END")) {
                     break;
                 }
+
+                purchaseLines.add(inputPurchase);
             }
 
+            // Обработка покупок
+            List<String> results = shoppingProcess(purchaseLines, buyers, products);
+
+            // Вывод результатов
+            System.out.println("\nРезультаты покупок:");
+            for (String result : results) {
+                System.out.println(result);
+            }
+
+            // Итоговый вывод
             System.out.println("\nИтоги:");
             for (Person buyer : buyers) {
                 System.out.println(buyer.toString());
@@ -84,8 +60,154 @@ public class App {
             System.err.println("Ошибка ввода данных: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
-        } finally {
-            scanner.close();
         }
+    }
+
+    private static List<Person> extractBuyersFromInput(String input) throws IllegalArgumentException {
+        if (input == null || input.trim().isEmpty()) {
+            throw new IllegalArgumentException("Входная строка не может быть пустой!");
+        }
+
+        List<Person> buyers = new ArrayList<>();
+
+        // Регулярное выражение для поиска пар "имя = деньги"
+        Pattern pattern = Pattern.compile("([^=]+)\\s*=\\s*(\\d+)");
+        Matcher matcher = pattern.matcher(input);
+
+        while (matcher.find()) {
+            String name = matcher.group(1).trim();      // Имя покупателя
+            double money = Double.parseDouble(matcher.group(2)); // Деньги покупателя
+
+            if (money <= 0) {
+                throw new IllegalArgumentException("Деньги должны быть положительными!");
+            }
+
+            if (name.isEmpty()) {
+                throw new IllegalArgumentException("Имя не может быть пустым!");
+            }
+
+            buyers.add(new Person(name, money));
+        }
+
+        return buyers;
+    }
+
+    private static List<Product> extractProductsFromInput(String input) throws IllegalArgumentException {
+        if (input == null || input.trim().isEmpty()) {
+            throw new IllegalArgumentException("Входная строка не может быть пустой!");
+        }
+
+        List<Product> products = new ArrayList<>();
+        String[] productEntries = input.split(" "); // Разделяем входную строку по пробелам
+
+        for (String entry : productEntries) {
+            if (entry.contains("=")) {
+                String[] parts = entry.split("=");
+                String productName = parts[0].trim();
+                String priceAndDiscount = parts[1].trim();
+
+                if (productName.isEmpty()) {
+                    throw new IllegalArgumentException("Название товара не может быть пустым!");
+                }
+
+                // Проверяем, является ли продукт скидочным (есть символ %)
+                if (priceAndDiscount.contains("%")) {
+                    // Это скидочный продукт
+                    String[] priceDiscountParts = priceAndDiscount.split(",");
+                    double price = Double.parseDouble(priceDiscountParts[0].trim());
+                    double discountPercent = Double.parseDouble(priceDiscountParts[1].replace("%", "").trim());
+                    LocalDate expirationDate = LocalDate.now().plusDays(7); // Пример: скидка действует 7 дней
+
+                    if (price <= 0 || discountPercent < 0 || discountPercent > 100) {
+                        throw new IllegalArgumentException("Цена и скидка должны быть корректными!");
+                    }
+
+                    products.add(new DiscountProduct(productName, price, discountPercent, expirationDate));
+                } else {
+                    // Это обычный продукт
+                    double price = Double.parseDouble(priceAndDiscount);
+
+                    if (price <= 0) {
+                        throw new IllegalArgumentException("Цена должна быть положительной!");
+                    }
+
+                    products.add(new Product(productName, price));
+                }
+            }
+        }
+
+        return products;
+    }
+
+    private static List<String> shoppingProcess(List<String> purchaseLines, List<Person> buyers, List<Product> products) {
+        List<String> results = new ArrayList<>();
+
+        for (String line : purchaseLines) {
+            if ("END".equals(line)) {
+                break;
+            }
+
+            String[] parts = line.split(" ");
+            if (parts.length == 2) {
+                String buyerName = parts[0];
+                String productName = parts[1];
+
+                Person buyer = findBuyerByName(buyers, buyerName);
+                Product product = findProductByName(products, productName);
+
+                if (buyer != null && product != null) {
+                    if (buyer.getMoney() >= product.getCost()) {
+                        buyer.setMoney(buyer.getMoney() - product.getCost());
+                        buyer.addPurchasedProduct(product);
+                        results.add(buyer.getName() + " купил " + product.getProductName());
+                    } else {
+                        results.add(buyer.getName() + " не может позволить себе " + product.getProductName());
+                    }
+                }
+            } else if (parts.length >= 3) {
+                // Если строка содержит больше двух слов, собираем имя покупателя из первых двух слов
+                String buyerName = parts[0] + " " + parts[1];
+
+                // Название продукта начинается с третьего слова до конца строки
+                StringBuilder sb = new StringBuilder();
+                for (int i = 2; i < parts.length; i++) {
+                    sb.append(parts[i]).append(" ");
+                }
+                String productName = sb.toString().trim(); // Убираем лишние пробелы в конце
+
+                Person buyer = findBuyerByName(buyers, buyerName);
+                Product product = findProductByName(products, productName);
+
+                if (buyer != null && product != null) {
+                    if (buyer.getMoney() >= product.getCost()) {
+                        buyer.setMoney(buyer.getMoney() - product.getCost());
+                        buyer.addPurchasedProduct(product);
+                        results.add(buyer.getName() + " купил " + product.getProductName());
+                    } else {
+                        results.add(buyer.getName() + " не может позволить себе " + product.getProductName());
+                    }
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private static Person findBuyerByName(List<Person> buyers, String name) {
+        for (Person buyer : buyers) {
+            if (buyer.getName().equalsIgnoreCase(name)) {
+                return buyer;
+            }
+        }
+        return null;
+    }
+
+    private static Product findProductByName(List<Product> products, String name) {
+        for (Product product : products) {
+            if (product.getProductName().equalsIgnoreCase(name)) {
+                return product;
+            }
+        }
+        return null;
     }
 }
