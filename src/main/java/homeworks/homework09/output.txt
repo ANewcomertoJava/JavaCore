@@ -1,0 +1,2 @@
+Создан автомобиль:
+Toyota Supra (2020) - 500 HP, 300 Suspension, 1000 Durability
