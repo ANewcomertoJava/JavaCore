@@ -1,4 +1,4 @@
-package homeworks.homework07;
+package homeworks.homework07New;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -11,7 +11,7 @@ public class DiscountProduct extends Product {
     public DiscountProduct(String productName, double cost, double discountPercent, LocalDate expirationDate) {
         super(productName, cost); // Вызов конструктора родительского класса
         setDiscountPercent(discountPercent);
-
+        setExpirationDate(expirationDate);
     }
 
     // Геттеры и сеттеры
@@ -30,7 +30,12 @@ public class DiscountProduct extends Product {
         return expirationDate;
     }
 
-
+    public void setExpirationDate(LocalDate expirationDate) {
+        if (expirationDate == null || expirationDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Срок действия скидки должен быть в будущем.");
+        }
+        this.expirationDate = expirationDate;
+    }
 
     // Метод для получения стоимости с учетом скидки
     public double getDiscountedPrice() {
