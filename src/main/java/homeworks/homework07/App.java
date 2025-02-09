@@ -1,13 +1,13 @@
 package homeworks.homework07;
 
+import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
-
         try (Scanner scanner = new Scanner(System.in)) {
             // Чтение списка покупателей
             System.out.print("Введите имена и деньги покупателей через равно: ");
@@ -56,8 +56,9 @@ public class App {
             for (Person buyer : buyers) {
                 System.out.println(buyer.toString());
             }
-        } catch (InputMismatchException | NumberFormatException e) {
-            System.err.println("Ошибка ввода данных: " + e.getMessage());
+
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("Ошибка ввода данных: неверный формат ввода.");
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
         }
@@ -65,74 +66,70 @@ public class App {
 
     private static List<Person> extractBuyersFromInput(String input) throws IllegalArgumentException {
         if (input == null || input.trim().isEmpty()) {
-            throw new IllegalArgumentException("Входная строка не может быть пустой!");
+            throw new IllegalArgumentException("Вводная строка не может быть пустой!");
         }
 
         List<Person> buyers = new ArrayList<>();
+        String[] namesAndMoney = input.split("=");
 
-        // Регулярное выражение для поиска пар "имя = деньги"
-        Pattern pattern = Pattern.compile("([^=]+)\\s*=\\s*(\\d+)");
-        Matcher matcher = pattern.matcher(input);
-
-        while (matcher.find()) {
-            String name = matcher.group(1).trim();      // Имя покупателя
-            double money = Double.parseDouble(matcher.group(2)); // Деньги покупателя
-
-            if (money <= 0) {
-                throw new IllegalArgumentException("Деньги должны быть положительными!");
-            }
-
-            if (name.isEmpty()) {
-                throw new IllegalArgumentException("Имя не может быть пустым!");
-            }
-
-            buyers.add(new Person(name, money));
+        if (namesAndMoney.length < 2) {
+            throw new IllegalArgumentException("Неверный формат записи покупателя: " + input);
         }
 
+        String name = namesAndMoney[0].trim();
+        double money;
+        try {
+            money = Double.parseDouble(namesAndMoney[1].trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Некорректная сумма денег: " + namesAndMoney[1]);
+        }
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Имя не может быть пустым!");
+        }
+
+        if (money <= 0) {
+            throw new IllegalArgumentException("Деньги должны быть положительными!");
+        }
+
+        buyers.add(new Person(name, money));
         return buyers;
     }
 
     private static List<Product> extractProductsFromInput(String input) throws IllegalArgumentException {
         if (input == null || input.trim().isEmpty()) {
-            throw new IllegalArgumentException("Входная строка не может быть пустой!");
+            throw new IllegalArgumentException("Вводная строка не может быть пустой!");
         }
 
         List<Product> products = new ArrayList<>();
-        String[] productEntries = input.split(" "); // Разделяем входную строку по пробелам
+        String[] productEntries = input.split(" ");
 
-        for (String entry : productEntries) {
-            if (entry.contains("=")) {
-                String[] parts = entry.split("=");
-                String productName = parts[0].trim();
-                String priceAndDiscount = parts[1].trim();
+        for (String productEntry : productEntries) {
+            String[] parts = productEntry.split("=");
+            if (parts.length < 2) {
+                throw new IllegalArgumentException("Неверный формат записи продукта: " + productEntry);
+            }
 
-                if (productName.isEmpty()) {
-                    throw new IllegalArgumentException("Название товара не может быть пустым!");
+            String productName = parts[0].trim();
+            String priceAndDiscount = parts[1].trim();
+
+            if (priceAndDiscount.contains("%")) {
+                String[] priceDiscountParts = priceAndDiscount.split(",");
+                double price = Double.parseDouble(priceDiscountParts[0].trim());
+                double discountPercent = Double.parseDouble(priceDiscountParts[1].replace("%", "").trim());
+                LocalDate expirationDate = LocalDate.now().plusDays(7); // Пример: скидка действует 7 дней
+                if (price <= 0 || discountPercent < 0 || discountPercent > 100) {
+                    throw new IllegalArgumentException("Цена и скидка должны быть корректными!");
                 }
 
-                // Проверяем, является ли продукт скидочным (есть символ %)
-                if (priceAndDiscount.contains("%")) {
-                    // Это скидочный продукт
-                    String[] priceDiscountParts = priceAndDiscount.split(",");
-                    double price = Double.parseDouble(priceDiscountParts[0].trim());
-                    double discountPercent = Double.parseDouble(priceDiscountParts[1].replace("%", "").trim());
-                    LocalDate expirationDate = LocalDate.now().plusDays(7); // Пример: скидка действует 7 дней
-
-                    if (price <= 0 || discountPercent < 0 || discountPercent > 100) {
-                        throw new IllegalArgumentException("Цена и скидка должны быть корректными!");
-                    }
-
-                    products.add(new DiscountProduct(productName, price, discountPercent, expirationDate));
-                } else {
-                    // Это обычный продукт
-                    double price = Double.parseDouble(priceAndDiscount);
-
-                    if (price <= 0) {
-                        throw new IllegalArgumentException("Цена должна быть положительной!");
-                    }
-
-                    products.add(new Product(productName, price));
+                products.add(new DiscountProduct(productName, price, discountPercent, expirationDate));
+            } else {
+                double price = Double.parseDouble(priceAndDiscount);
+                if (price <= 0) {
+                    throw new IllegalArgumentException("Цена должна быть положительной!");
                 }
+
+                products.add(new Product(productName, price));
             }
         }
 
@@ -156,30 +153,7 @@ public class App {
                 Product product = findProductByName(products, productName);
 
                 if (buyer != null && product != null) {
-                    if (buyer.getMoney() >= product.getCost()) {
-                        buyer.setMoney(buyer.getMoney() - product.getCost());
-                        buyer.addPurchasedProduct(product);
-                        results.add(buyer.getName() + " купил " + product.getProductName());
-                    } else {
-                        results.add(buyer.getName() + " не может позволить себе " + product.getProductName());
-                    }
-                }
-            } else if (parts.length >= 3) {
-                // Если строка содержит больше двух слов, собираем имя покупателя из первых двух слов
-                String buyerName = parts[0] + " " + parts[1];
-
-                // Название продукта начинается с третьего слова до конца строки
-                StringBuilder sb = new StringBuilder();
-                for (int i = 2; i < parts.length; i++) {
-                    sb.append(parts[i]).append(" ");
-                }
-                String productName = sb.toString().trim(); // Убираем лишние пробелы в конце
-
-                Person buyer = findBuyerByName(buyers, buyerName);
-                Product product = findProductByName(products, productName);
-
-                if (buyer != null && product != null) {
-                    if (buyer.getMoney() >= product.getCost()) {
+                    if (buyer.canBuyProduct(product)) {
                         buyer.setMoney(buyer.getMoney() - product.getCost());
                         buyer.addPurchasedProduct(product);
                         results.add(buyer.getName() + " купил " + product.getProductName());
@@ -199,6 +173,7 @@ public class App {
                 return buyer;
             }
         }
+
         return null;
     }
 
@@ -208,6 +183,7 @@ public class App {
                 return product;
             }
         }
+
         return null;
     }
 }

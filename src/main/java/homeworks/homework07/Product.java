@@ -6,10 +6,18 @@ public class Product {
     private String productName;
     private double cost;
 
-    // Конструктор
     public Product(String productName, double cost) {
         setProductName(productName);
         setCost(cost);
+    }
+
+    public void setProductName(String productName) {
+        if (productName == null || productName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Название продукта не может быть пустым.");
+        } else if (productName.length() < 3 || productName.matches("\\d+")) {
+            throw new IllegalArgumentException("Название продукта должно быть длиннее 2 символов и не состоять только из цифр.");
+        }
+        this.productName = productName;
     }
 
     // Геттеры и сеттеры
@@ -17,12 +25,7 @@ public class Product {
         return productName;
     }
 
-    public void setProductName(String productName) {
-        if (productName == null || productName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Название продукта не может быть пустым.");
-        }
-        this.productName = productName;
-    }
+
 
     public double getCost() {
         return cost;

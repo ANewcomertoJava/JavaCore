@@ -52,6 +52,10 @@ public class Person {
     }
 
 
+    public boolean canBuyProduct(Product product) {
+        return getMoney() >= product.getCost();
+    }
+
     public void addPurchasedProduct(Product product) {
     }
 }
