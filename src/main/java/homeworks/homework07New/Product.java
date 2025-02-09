@@ -1,4 +1,4 @@
-package homeworks.homework07;
+package homeworks.homework07New;
 
 import java.util.Objects;
 
