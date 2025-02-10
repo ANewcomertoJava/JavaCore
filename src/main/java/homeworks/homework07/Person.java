@@ -1,5 +1,6 @@
 package homeworks.homework07;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Person {
@@ -10,6 +11,9 @@ public class Person {
     public Person(String name, double money) {
         setName(name);
         setMoney(money);
+    }
+
+    public Person(String surname, String name, String patronymic, LocalDate dateOfBirth, long phoneNumber, char gender, int age) {
     }
 
     // Геттеры и сеттеры
