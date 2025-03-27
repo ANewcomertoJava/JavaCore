@@ -11,7 +11,7 @@ insert into product (description, price, quantity) VALUES
         ('Флешка 32GB', 19.99, 50),
         ('Внешний HDD 1TB', 89.99, 7);
 
--- Заполнение таблицы Покупатель (10 записей)
+-- Заполнение таблицы Покупатель (10 записей).
 insert into buyer (fio) VALUES
         ('Иванов Иван'),
         ('Петров Петр'),

@@ -10,7 +10,7 @@ UPDATE product SET quantity = quantity - 5 WHERE description = 'Флешка 32G
 -- 4. Удалить заказ, сделанный 2023-01-24
 DELETE FROM orders WHERE order_date = '2023-01-24';
 
--- 5. Вывести список всех заказов с информацией о покупателе и товаре
+-- 5. Вывести список всех заказов с информацией о покупателе и товаре.
 SELECT o.id, b.fio AS buyer, p.description AS product, o.order_date, o.quantity, p.price, (o.quantity * p.price) AS total
 FROM orders o
          JOIN buyer b ON o.buyer_id = b.id
