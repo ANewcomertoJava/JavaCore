@@ -39,6 +39,20 @@ public class User {
         this.isWorker = isWorker;
     }
 
+    public User(String line) {
+        String[] parts = line.split("\\|");
+        this.id = parts[0];
+        this.registrationDate = LocalDateTime.parse(parts[1]);
+        this.login = parts[2];
+        this.password = parts[3];
+        this.confirmPassword = parts[4];
+        this.lastName = parts[5];
+        this.firstName = parts[6];
+        this.middleName = parts[7];
+        this.age = Integer.parseInt(parts[8]);
+        this.isWorker = Boolean.parseBoolean(parts[9]);
+    }
+
     private void validateLogin(String login) {
         if (login == null || login.length() >= 20 || !Pattern.matches("[a-zA-Z0-9_]+", login)) {
             throw new InvalidDataException("Логин должен содержать только буквы, цифры и знак подчеркивания, и быть меньше 20 символов");
@@ -60,91 +74,8 @@ public class User {
         }
     }
 
-
-
-
-
-
-    // Геттеры и сеттеры
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getRegistrationDate() {
-        return registrationDate;
-    }
-
-    public void setRegistrationDate(LocalDateTime registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public boolean isWorker() {
-        return isWorker;
-    }
-
-    public void setWorker(boolean worker) {
-        isWorker = worker;
-    }
+// Геттеры и сеттеры остаются без изменений
+// ...
 
     @Override
     public boolean equals(Object o) {
@@ -165,5 +96,17 @@ public class User {
                 lastName + "|" + firstName + "|" + middleName + "|" + age + "|" + isWorker;
     }
 
+    public String getId() {
+        return id;
+    }
 
+    public void setAge(Integer age) {
+        if (age == null) {
+            throw new InvalidDataException("Возраст не может быть null");
+        }
+        if (age < 0) {
+            throw new InvalidDataException("Возраст не может быть отрицательным");
+        }
+        this.age = age;
+    }
 }

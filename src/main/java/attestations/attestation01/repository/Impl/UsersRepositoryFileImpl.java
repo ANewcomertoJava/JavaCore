@@ -13,20 +13,45 @@ import java.util.List;
 
 public class UsersRepositoryFileImpl implements UsersRepository {
     private static final String FILE_NAME = "users.txt";
+    private static final List<User> users = new ArrayList<>();
 
-    @Override
-    public void create(User user) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            writer.write(user.toString());
-            writer.newLine();
+    public UsersRepositoryFileImpl() {
+        try {
+            loadFromFile();
+        } catch (FileOperationException e) {
+            // Логируем ошибку, но продолжаем работу с пустым списком
+            System.err.println("Предупреждение: " + e.getMessage());
+            users.clear();
+        }
+    }
+
+    private void loadFromFile() {
+        File file = new File(FILE_NAME);
+
+        // Если файла нет, просто возвращаемся (создадим его при первой записи)
+        if (!file.exists()) {
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                users.add(new User(line));
+            }
         } catch (IOException e) {
-            throw new FileOperationException("Ошибка записи в файл", e);
+            throw new FileOperationException("Ошибка чтения файла", e);
         }
     }
 
     @Override
+    public void create(User user) {
+        users.add(user);
+        saveToFile();
+    }
+
+    @Override
     public User findById(String id) {
-        return findAll().stream()
+        return users.stream()
                 .filter(user -> user.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException("Пользователя с идентификатором " + id + " не существует"));
@@ -34,68 +59,52 @@ public class UsersRepositoryFileImpl implements UsersRepository {
 
     @Override
     public List<User> findAll() {
-        List<User> users = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("\\|");
-                users.add(new User(
-                        parts[0],
-                        LocalDateTime.parse(parts[1]),
-                        parts[2],
-                        parts[3],
-                        parts[4],
-                        parts[5],
-                        parts[6],
-                        parts[7],
-                        Integer.parseInt(parts[8]),
-                        Boolean.parseBoolean(parts[9])
-                ));
-            }
-        } catch (IOException e) {
-            throw new FileOperationException("Ошибка чтения файла", e);
-        }
-        return users;
+        return new ArrayList<>(users);
     }
 
     @Override
     public void update(User user) {
-        List<User> users = findAll();
         boolean found = users.removeIf(u -> u.getId().equals(user.getId()));
         if (!found) {
             throw new UserNotFoundException("Пользователя с идентификатором " + user.getId() + " не существует");
         }
         users.add(user);
-        writeAll(users);
+        saveToFile();
     }
 
     @Override
     public void deleteById(String id) {
-        List<User> users = findAll();
         boolean removed = users.removeIf(user -> user.getId().equals(id));
         if (!removed) {
             throw new UserNotFoundException("Пользователя с идентификатором " + id + " не существует");
         }
-        writeAll(users);
+        saveToFile();
     }
 
     @Override
     public void deleteAll() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            writer.write("");
-        } catch (IOException e) {
-            throw new FileOperationException("Ошибка очистки файла", e);
-        }
+        users.clear();
+        saveToFile();
     }
 
-    private void writeAll(List<User> users) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (User user : users) {
-                writer.write(user.toString());
-                writer.newLine();
+    private void saveToFile() {
+        try {
+            // Создаем файл, если его нет
+            File file = new File(FILE_NAME);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            // Записываем данные
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                for (User user : users) {
+                    writer.write(user.toString());
+                    writer.newLine();
+                }
             }
         } catch (IOException e) {
             throw new FileOperationException("Ошибка записи в файл", e);
         }
     }
-}
+
+    }
