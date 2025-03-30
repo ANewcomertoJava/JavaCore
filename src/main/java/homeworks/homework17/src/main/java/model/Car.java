@@ -16,6 +16,7 @@ public class Car {
     private int suspension;
     private int durability;
 
+
     @Override
     public String toString() {
         return String.format("Brand: %s, Model: %s, Year: %d, Horsepower: %d, Acceleration: %d, Suspension: %d, Durability: %d",
