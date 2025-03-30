@@ -1,4 +1,4 @@
-package homeworks.homework013.utils;
+package homeworks.homework13.utils;
 
 
 public interface ByCondition<T> {

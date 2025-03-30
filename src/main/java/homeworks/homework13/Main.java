@@ -1,6 +1,6 @@
-package homeworks.homework013;
+package homeworks.homework13;
 
-import homeworks.homework013.utils.NumberParser;
+import homeworks.homework13.utils.NumberParser;
 
 public class Main {
     public static void main(String[] args) {
