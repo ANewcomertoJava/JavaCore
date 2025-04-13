@@ -1,2 +1,0 @@
-Создан автомобиль:
-Brand: Toyota, Model: Supra, Year: 2020, Horsepower: 500, Acceleration: 4, Suspension: 300, Durability: 1000

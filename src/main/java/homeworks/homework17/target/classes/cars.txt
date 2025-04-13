@@ -1,1 +1,0 @@
-Brand: Volga, Model: Number, Year: 2019, Horsepower: 400, Acceleration: 5, Suspension: 400, Durability: 900
