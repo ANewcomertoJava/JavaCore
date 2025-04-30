@@ -1,9 +1,10 @@
-package attestations.attestation03.src.main.java.zhkh.model;
+package zhkh.model;
 // показания счетчика
 
 
-import lombok.Data;
 import javax.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDate;
 
 @Data
