@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import zhkh.dto.ApartmentDTO;
 import zhkh.model.Apartment;
 import zhkh.repository.ApartmentRepository;
+import zhkh.utils.ValidationUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,17 +23,20 @@ public class ApartmentService {
                 .collect(Collectors.toList());
     }
 
-    public ApartmentDTO save(ApartmentDTO apartmentDTO) {
-        Apartment apartment = convertToEntity(apartmentDTO);
-        Apartment saved = apartmentRepository.save(apartment);
-        return convertToDTO(saved);
-    }
+
 
     public void delete(Long id) {
         apartmentRepository.findById(id).ifPresent(apartment -> {
             apartment.setDeleted(true);
             apartmentRepository.save(apartment);
         });
+    }
+
+    public ApartmentDTO save(ApartmentDTO apartmentDTO) {
+        ValidationUtils.validateApartment(apartmentDTO);
+        Apartment apartment = convertToEntity(apartmentDTO);
+        Apartment saved = apartmentRepository.save(apartment);
+        return convertToDTO(saved);
     }
 
     private ApartmentDTO convertToDTO(Apartment apartment) {
