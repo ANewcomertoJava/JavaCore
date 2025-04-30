@@ -78,5 +78,12 @@ class UtilityMeasurementServiceTest {
         assertTrue(measurement.isDeleted());
         verify(measurementRepository, times(1)).save(measurement);
     }
+    @Test
+    void save_ShouldThrowExceptionWhenValuesAreNegative() {
+        UtilityMeasurementDTO dto = new UtilityMeasurementDTO();
+        dto.setApartmentId(1L);
+        dto.setColdWater(-10.0);
+        assertThrows(IllegalArgumentException.class, () -> measurementService.save(dto));
+    }
 
 }

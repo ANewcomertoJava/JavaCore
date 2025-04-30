@@ -46,10 +46,14 @@ class ApartmentServiceTest {
         // Arrange
         ApartmentDTO dto = new ApartmentDTO();
         dto.setAddress("Test Address");
+        dto.setApartmentNumber(1); // Добавьте эту строку
+        dto.setArea(50.0); // Опционально, если есть валидация
 
         Apartment savedApartment = new Apartment();
         savedApartment.setId(1L);
         savedApartment.setAddress("Test Address");
+        savedApartment.setApartmentNumber(1);
+        savedApartment.setArea(50.0);
 
         when(apartmentRepository.save(any(Apartment.class))).thenReturn(savedApartment);
 
@@ -75,6 +79,12 @@ class ApartmentServiceTest {
         // Assert
         assertTrue(apartment.isDeleted());
         verify(apartmentRepository, times(1)).save(apartment);
+    }
+    @Test
+    void save_ShouldThrowExceptionWhenAddressIsEmpty() {
+        ApartmentDTO dto = new ApartmentDTO();
+        dto.setApartmentNumber(1);
+        assertThrows(IllegalArgumentException.class, () -> apartmentService.save(dto));
     }
 
 
