@@ -1,9 +1,11 @@
 package tvapp.entity;
 
 
-import jakarta.persistence.*;
-import lombok.*;
 
+import lombok.*;
+import org.springframework.data.annotation.Id;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
