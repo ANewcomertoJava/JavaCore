@@ -19,7 +19,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Версии зависимостей -->
-        <postgresql.version>42.7.4</postgresql.version>
+        <postgresql.version>42.7.2</postgresql.version>
         <lombok.version>1.18.30</lombok.version>
         <flyway.version>10.11.0</flyway.version>
     </properties>
@@ -88,6 +88,7 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+
             </plugin>
         </plugins>
     </build>
