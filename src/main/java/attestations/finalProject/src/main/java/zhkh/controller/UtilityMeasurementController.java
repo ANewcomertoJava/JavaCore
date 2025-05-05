@@ -2,11 +2,15 @@ package zhkh.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import zhkh.dto.UtilityMeasurementDTO;
 import zhkh.service.UtilityMeasurementService;
+
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -35,8 +39,27 @@ public class UtilityMeasurementController {
 
     @Operation(summary = "Добавить новые показания")
     @PostMapping
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Данные показаний коммунальных услуг",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Пример запроса",
+                            value = """
+                {
+                    "apartmentId": 1,
+                    "measurementDate": "2023-05-15",
+                    "coldWater": 10.5,
+                    "hotWater": 7.3,
+                    "electricity": 125.8
+                }
+                """
+                    )
+            )
+    )
     public UtilityMeasurementDTO createMeasurement(
-            @RequestBody @Schema(description = "Данные показаний") UtilityMeasurementDTO measurementDTO) {
+            @RequestBody @Valid UtilityMeasurementDTO measurementDTO) {
         return measurementService.save(measurementDTO);
     }
 

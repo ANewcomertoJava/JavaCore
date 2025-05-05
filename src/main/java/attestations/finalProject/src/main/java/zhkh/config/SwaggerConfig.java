@@ -1,6 +1,8 @@
 package zhkh.config;
 
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,12 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("ЖКХ Управление API")
                         .version("1.0")
-                        .description("API для управления квартирами и показаниями коммунальных услуг"));
+                        .description("API для управления квартирами и показаниями коммунальных услуг")
+                        .contact(new Contact()
+                                .name("Поддержка")
+                                .email("support@zhkh.ru")))
+                .externalDocs(new ExternalDocumentation()
+                        .description("Документация проекта")
+                        .url("https://github.com/yourrepo/zhkh/docs"));
     }
 }

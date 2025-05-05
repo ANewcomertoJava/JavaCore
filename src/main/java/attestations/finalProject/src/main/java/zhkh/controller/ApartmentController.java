@@ -2,11 +2,15 @@ package zhkh.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import zhkh.dto.ApartmentDTO;
 import zhkh.service.ApartmentService;
+
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -28,7 +32,18 @@ public class ApartmentController {
 
     @Operation(summary = "Создать новую квартиру")
     @PostMapping
-    public ApartmentDTO createApartment(@RequestBody @Schema(description = "Данные квартиры") ApartmentDTO apartmentDTO) {
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Данные для создания квартиры",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Пример запроса",
+                            value = "{\"address\": \"ул. Ленина, 10\", \"apartmentNumber\": 25, \"area\": 42.5}"
+                    )
+            )
+    )
+    public ApartmentDTO createApartment(@RequestBody @Valid ApartmentDTO apartmentDTO) {
         return apartmentService.save(apartmentDTO);
     }
 
