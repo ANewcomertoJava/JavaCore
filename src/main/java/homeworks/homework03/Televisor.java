@@ -29,7 +29,7 @@ public class Televisor {
     public double getDiagonal() {
         return diagonal;
     }
-    // Печатает информацию о телевизоре
+    // Печатает информацию о телевизоре _
     public void printInfo() {
         System.out.println("Производитель: " + manufacturer);
         System.out.println("Модель: " + model);
